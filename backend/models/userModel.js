@@ -9,11 +9,15 @@ const userModel = new mongoose.Schema(
     userName: {
       type: String,
       require: true,
-      uinque: true,
+      unique: true,
     },
     password: {
       type: String,
       require: true,
+    },
+    confirmPassword: {
+        type: String,
+        require: true
     },
     profilePhoto: {
       type: String,
@@ -27,3 +31,4 @@ const userModel = new mongoose.Schema(
   },{ timestamps: true });
 
 export const User = mongoose.model("User", userModel) 
+

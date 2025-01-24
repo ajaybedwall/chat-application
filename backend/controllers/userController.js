@@ -6,17 +6,17 @@ export const register = async (req, res) => {
   try {
     const { fullName, userName, password, confirmPassword, gender } = req.body;
 
-    // Field validation
+ 
     if (!fullName || !userName || !password || !confirmPassword || !gender) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Password confirmation check
+  
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    // Username uniqueness check
+
     const user = await User.findOne({ userName });
     if (user) {
       return res
@@ -26,14 +26,14 @@ export const register = async (req, res) => {
         });
     }
 
-    // Hash password
+ 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Assign gender-based profile photo
+  
     const maleProfilePhoto = `https://avatar.iran.liara.run/public/boy?username=${userName}`;
     const femaleProfilePhoto = `https://avatar.iran.liara.run/public/girl?username=${userName}`;
 
-    // Create user
+  
     await User.create({
       userName,
       fullName,
@@ -56,12 +56,12 @@ export const login = async (req, res) => {
   try {
     const { userName, password } = req.body;
 
-    // Field validation
+   
     if (!userName || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Find user
+  
     const user = await User.findOne({ userName });
     if (!user) {
       return res.status(400).json({
@@ -70,7 +70,7 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check password
+   
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
       return res.status(400).json({
@@ -79,7 +79,7 @@ export const login = async (req, res) => {
       });
     }
 
-    // Generate JWT token
+  
     const tokenData = {
       userId: user._id,
     };
@@ -116,4 +116,13 @@ export const logout = (req, res) => {
     } catch (error) {
         
     }
+}
+export const getOtherUsers = async (req, res) => {
+  try {
+    const LoggedInUserId = req.id;
+    const otherUsers = await User.find({ _id: { $ne: LoggedInUserId } }).select("-password")
+    return res.status(200).json(otherUsers)
+  } catch (error) {
+    console.log(error);
+  }
 }
